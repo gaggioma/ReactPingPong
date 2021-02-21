@@ -1,6 +1,10 @@
 # Getting Started with Create React App
 
+<<<<<<< HEAD
 Tore oveThis project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+=======
+This pippo project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+>>>>>>> 5fae07e92569a08e08cc367f5e5a888b35b15bb4
 
 ## Available Scripts
 
