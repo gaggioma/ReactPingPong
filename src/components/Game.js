@@ -14,6 +14,12 @@ export default function Game(props) {
     const pHeight = 150;
     const pWidth = 20
 
+    //Game ref
+    const gameRef = React.createRef();
+
+    const [finish, setFinish] = useState(false)
+    const [start, setStart] = useState(false)
+
     //Ball
     const [ballStepSize, setBallStepSize] = useState(7);
     const [ballSpeed, setBallSpeed] = useState(10)
@@ -23,7 +29,17 @@ export default function Game(props) {
     const ballW = 40;
 
     //Window dimension
-    const { height, width } = useWindowDimensions();
+    //const { height, width } = useWindowDimensions();
+    const [gameDim, setGameDim] = useState()
+    useEffect(() => {
+        const width = gameRef.current.clientWidth;
+        const height = gameRef.current.clientHeight;
+        setGameDim({
+            width: width,
+            height: height
+        })
+        setStart(true)
+    }, [])
 
     //position first paddle
     const [y1, setY1] = useState(150);
@@ -53,63 +69,71 @@ export default function Game(props) {
     //Move ball
     useEffect(()=> {
 
+        if(start){
+
         //Update right paddle with new position
-        setY1(ballPosition.top + ballStepY * signy + pHeight >= height ? height - pHeight : ballPosition.top + ballStepY * signy)
+            setY1(ballPosition.top + ballStepY * signy + pHeight >= gameDim.height ? gameDim.height - pHeight : ballPosition.top + ballStepY * signy)
+       
 
-        const timer = setTimeout(()=>{
+            const timer = setTimeout(()=>{
 
-            //overflow top change sign on top
-            if(isOutsideUp(ballPosition.top + ballStepY * signy, ballH)){                
-                setSignY(signy == 1 ? -1 : 1);
-            }
-
-            else if(isOutsideDown(ballPosition.top + ballStepY * signy, ballH)){
-                setSignY(signy == 1 ? -1 : 1);
-            }
-
-            //Overflow left change sign of lef
-            else if(isOutsideLeft(ballPosition.left + ballStepSize * signx, ballW)){
-
-                //Ball is in paddle
-                if(ballPosition.top >=  y2 && ballPosition.top <= y2 + pHeight){
-
-                    //Increase speed
-                    setBallStepSize(ballStepSize + 1); 
-
-                    //Random angle
-                    setBallStepY(Math.floor(Math.random() * 6) + 3); 
-                    
-                    //Invert direction
-                    setSignX(signx == 1 ? -1 : 1);
+                //overflow top change sign on top
+                if(isOutsideUp(ballPosition.top + ballStepY * signy, ballH)){                
+                    setSignY(signy == 1 ? -1 : 1);
                 }
-            }  
-            else if(isOutsideRight(ballPosition.left + ballStepSize * signx, ballW)){
 
-                //Ball is in paddle
-                if(ballPosition.top >=  y1 && ballPosition.top <= y1 + pHeight){
-
-                    //Increase speed
-                    setBallStepSize(ballStepSize + 1);  
-
-                     //Random angle
-                    setBallStepY(Math.floor(Math.random() * 6) + 3);
-
-                     //Invert direction
-                    setSignX(signx == 1 ? -1 : 1);
+                else if(isOutsideDown(ballPosition.top + ballStepY * signy, ballH)){
+                    setSignY(signy == 1 ? -1 : 1);
                 }
-            }
-            else{
 
-                var target = {}
-                Object.assign(target, ballPosition);
-                target.left =  target.left + ballStepSize * signx;
-                target.top =  target.top + ballStepY * signy;          
-                setBallPosition(target)
-            }
+                //Overflow left change sign of lef
+                else if(isOutsideLeft(ballPosition.left + ballStepSize * signx, ballW)){
 
-            
-            
-        }, ballSpeed); 
+                    //Ball is in paddle
+                    if(ballPosition.top >=  y2 && ballPosition.top <= y2 + pHeight){
+
+                        //Increase speed
+                        setBallStepSize(ballStepSize + 1); 
+
+                        //Random angle
+                        setBallStepY(Math.floor(Math.random() * 6) + 3); 
+                        
+                        //Invert direction
+                        setSignX(signx == 1 ? -1 : 1);
+                    }else{
+                        setFinish(true)
+                    }
+                }  
+                else if(isOutsideRight(ballPosition.left + ballStepSize * signx, ballW)){
+
+                    //Ball is in paddle
+                    if(ballPosition.top >=  y1 && ballPosition.top <= y1 + pHeight){
+
+                        //Increase speed
+                        setBallStepSize(ballStepSize + 1);  
+
+                        //Random angle
+                        setBallStepY(Math.floor(Math.random() * 6) + 3);
+
+                        //Invert direction
+                        setSignX(signx == 1 ? -1 : 1);
+                    }else{
+                        setFinish(true)
+
+                    }
+                }
+                else{
+
+                    var target = {}
+                    Object.assign(target, ballPosition);
+                    target.left =  target.left + ballStepSize * signx;
+                    target.top =  target.top + ballStepY * signy;          
+                    setBallPosition(target)
+                }
+                
+            }, ballSpeed); 
+
+        }
                     
     }, [ballPosition])
 
@@ -124,13 +148,17 @@ export default function Game(props) {
     }, [signx, signy])
 
     useEffect(() => {
-        setOutside1Up(isOutsideUp(y1, pHeight))
-        setOutside1Down(isOutsideDown(y1, pHeight))
+        if(start){
+            setOutside1Up(isOutsideUp(y1, pHeight))
+            setOutside1Down(isOutsideDown(y1, pHeight))
+        }
     }, [y1])
 
     useEffect(() => {
-        setOutside2Up(isOutsideUp(y2, pHeight))
-        setOutside2Down(isOutsideDown(y2, pHeight))
+        if(start){
+            setOutside2Up(isOutsideUp(y2, pHeight))
+            setOutside2Down(isOutsideDown(y2, pHeight))
+        }
     }, [y2])
 
     //Check if paddle is ouside
@@ -138,7 +166,7 @@ export default function Game(props) {
         return y < 0 ? true : false;
     }
     const isOutsideDown = (y, h) => {
-        return y + h > height ? true : false;
+        return y + h > gameDim.height ? true : false;
     }
 
     const isOutsideLeft = (x, w) => {
@@ -146,68 +174,88 @@ export default function Game(props) {
     }
 
     const isOutsideRight = (x, w) => {
-        return x + w > width ? true : false;
+        return x + w > gameDim.width ? true : false;
     }
 
     //Paddle direction command
     const onKeyPressed = (event) => {
         event.preventDefault()
         if(event.code == "ArrowUp" && !outside1Up && !outside2Up){
-            //setY1(y1 - stepSize < 0 ? 0 : y1 - stepSize);
             setY2(y2 - stepSize < 0 ? 0 : y2 - stepSize);
         } else if(event.code == "ArrowDown" && !outside1Down && !outside2Down){
-            //setY1(y1 + stepSize + pHeight >= height ? height - pHeight : y1 + stepSize);
-            setY2(y2 + stepSize + pHeight >= height ? height - pHeight : y2 + stepSize);
+            setY2(y2 + stepSize + pHeight >= gameDim.height ? gameDim.height - pHeight : y2 + stepSize);
         }        
     }
 
     const onMouseWheel = (event) => {
         
         if( event.deltaY < 0 && !outside1Up && !outside2Up){
-            //setY1(y1 - stepSize < 0 ? 0 : y1 - stepSize);
             setY2(y2 - stepSize < 0 ? 0 : y2 - stepSize);
         } else if(event.deltaY > 0 && !outside1Down && !outside2Down){
-            //setY1(y1 + stepSize + pHeight >= height ? height - pHeight : y1 + stepSize);
-            setY2(y2 + stepSize + pHeight >= height ? height - pHeight : y2 + stepSize);
+            setY2(y2 + stepSize + pHeight >= gameDim.height ? gameDim.height - pHeight : y2 + stepSize);
         }    else{
-            console.log(event)
+            //console.log(event)
         }
     }
-
-    
     return(
-    <div className="Game"
-    onKeyDown={onKeyPressed}
-    onWheel = {onMouseWheel}
-    tabIndex="0"
-    >
 
-        <div style={{color: "white"}} >
-        width: {width} ~ height: {height}
+    <div className="GameContainer">
+
+
+
+        <div ref={gameRef} className="Game"
+        onKeyDown={onKeyPressed}
+        onWheel = {onMouseWheel}
+        tabIndex="0"
+        >
+
+            <div style={{color: "white"}} >
+            width: {width} ~ height: {height}
+            </div>
+
+            {gameDim ?
+            <div style={{color: "white"}} >
+            width: {gameDim.width} ~ height: {gameDim.height}
+            </div>
+            :
+            null
+            }
+
+            {
+                outside2Down ? 
+                <div style={{color: "white"}} >
+                outside
+                </div>
+                : null
+
+            }
+           
+
+
+
+            <Paddle
+            y={y1}
+            r={r1}
+            h={pHeight}
+            w={pWidth}
+            >    
+            </Paddle>
+
+            <Paddle
+            y={y2}
+            l={l2}
+            h={pHeight}
+            w={pWidth}
+            >   
+            </Paddle>
+
+            <Ball
+            w={ballW}
+            h={ballH}
+            position={ballPosition}>
+            </Ball>
+
         </div>
-
-        <Paddle
-        y={y1}
-        r={r1}
-        h={pHeight}
-        w={pWidth}
-        >    
-        </Paddle>
-
-        <Paddle
-        y={y2}
-        l={l2}
-        h={pHeight}
-        w={pWidth}
-        >   
-        </Paddle>
-
-        <Ball
-        w={ballW}
-        h={ballH}
-        position={ballPosition}>
-        </Ball>
-
     </div>
     );
 

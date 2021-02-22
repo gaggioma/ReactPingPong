@@ -1,4 +1,13 @@
 .Game{
+
+    width: 100%;
+    height: 100%;
+    position: relative;
+    outline: #4CAF50 solid 10px;
+    margin: auto;
+}
+
+.GameContainer{
     background-color: black;
     width: 100vw;
     height: 100vh;
