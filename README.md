@@ -2,9 +2,9 @@
 
 ## Main purpose
 
-This simple project contains code to run elementary Ping Ping game.
+This simple project contains code to build elementary Ping Ping game.
 <br />
-My purpose was to try the power of React in animate web application, maintainig the code simpler possibile for further improvements.
+My purpose was to try the power of React in animate web application maintainig the code simpler possibile for further improvements.
 <br />
 Whole applicaton was developped using React Hooks, that i consider the cleanest and fastest way to write code in React.
 
