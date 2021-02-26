@@ -1,0 +1,8 @@
+.scoreClass{
+    color: white;
+    position: absolute;
+    font-size: xx-large;
+    border: 3px dotted blue;
+    text-align: center;
+    width: 50px;
+}

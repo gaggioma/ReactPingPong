@@ -5,6 +5,7 @@ import "./Game.css"
 //components
 import Paddle from "./Paddle.js"
 import Ball from "./Ball.js"
+import Score from "./Score.js"
 
 import useWindowDimensions from "./useWindowDimensions.js"
 
@@ -46,7 +47,7 @@ export default function Game(props) {
             height: height
         })
         setStart(true)
-    }, [])
+    }, [useWindowDimensions()])
 
     //position right paddle
     const [y1, setY1] = useState(150);
@@ -77,18 +78,22 @@ export default function Game(props) {
     //Ball step size y
     const [ballStepY, setBallStepY] = useState(2)
 
+    //Score
+    const [scoreLeft, setScoreLeft] = useState(0)
+    const [scoreRight, setScoreRight] = useState(0)
+
     //Move ball
     useEffect(()=> {
 
         if(start){
 
-            //Auto pilot*_
-            if(rightPaddleAutoPilot){
+            //Auto pilot
+            //if(rightPaddleAutoPilot){
                 setY1(ballPosition.top + ballStepY * signy + pHeight >= gameDim.height ? gameDim.height - pHeight : ballPosition.top + ballStepY * signy)
-            }
+            //}
 
             if(leftPaddleAutoPilot){
-                setY2(ballPosition.top + ballStepY * signy + pHeight >= gameDim.height ? gameDim.height - pHeight : ballPosition.top + ballStepY * signy)
+                //setY2(ballPosition.top + ballStepY * signy + pHeight >= gameDim.height ? gameDim.height - pHeight : ballPosition.top + ballStepY * signy)
             }
 
             const timer = setTimeout(()=>{
@@ -122,7 +127,9 @@ export default function Game(props) {
                         setLeftPaddleAutoPilot(false);
 
                     }else{
-                        setFinish(true)
+                        setScoreRight(scoreRight + 1)
+                        //setFinish(true)
+                        resetGame()
                     }
                 }  
                 else if(isOutsideRight(ballPosition.left + ballStepSize * signx, ballW)){
@@ -144,8 +151,9 @@ export default function Game(props) {
                         setLeftPaddleAutoPilot(true);
 
                     }else{
-                        setFinish(true)
-
+                        //setFinish(true)
+                        setScoreLeft(scoreLeft + 1)
+                        resetGame()
                     }
                 }
                 else{
@@ -157,7 +165,7 @@ export default function Game(props) {
                     setBallPosition(target)
                 }
                 
-            }, ballSpeed); 
+            }, ballSpeed);
 
         }
                     
@@ -186,6 +194,24 @@ export default function Game(props) {
             setOutside2Down(isOutsideDown(y2, pHeight))
         }
     }, [y2])
+
+    const resetGame = () =>{
+
+        const timer = setTimeout(()=>{
+            //Restart game
+            setBallPosition({
+                left: 200,
+                top: 200
+            })
+
+            setBallStepSize(7)
+            setFinish(!finish)
+
+            setSignY(1)
+            setSignX(1)
+        }, 3000)
+        
+    }
 
     //Check if paddle is ouside
     const isOutsideUp = (y, h) => {
@@ -227,8 +253,6 @@ export default function Game(props) {
 
     <div className="GameContainer">
 
-
-
         <div ref={gameRef} className="Game"
         onKeyDown={onKeyPressed}
         onWheel = {onMouseWheel}
@@ -249,6 +273,7 @@ export default function Game(props) {
 
             }
             
+            <div className="midlineClass"></div>
 
             
 
@@ -285,6 +310,18 @@ export default function Game(props) {
             h={ballH}
             position={ballPosition}>
             </Ball>
+
+            <Score
+                score={scoreLeft}
+                style={{top: "10%", left: "23%"}}>
+            </Score>
+
+            
+            <Score
+                score={scoreRight}
+                style={{top: "10%", right: "23%"}}>
+            </Score>
+            
 
         </div>
     </div>
