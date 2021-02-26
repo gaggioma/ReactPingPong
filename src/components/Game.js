@@ -117,7 +117,7 @@ export default function Game(props) {
                         setBallStepSize(ballStepSize + 1); 
 
                         //Random angle
-                        setBallStepY(Math.floor(Math.random() * 10) + 3); 
+                        setBallStepY(Math.floor(Math.random() * 6) + 3); 
                         
                         //Invert direction
                         setSignX(signx == 1 ? -1 : 1);
@@ -141,7 +141,7 @@ export default function Game(props) {
                         setBallStepSize(ballStepSize + 1);  
 
                         //Random angle
-                        setBallStepY(Math.floor(Math.random() * 10) + 3);
+                        setBallStepY(Math.floor(Math.random() * 6) + 3);
 
                         //Invert direction
                         setSignX(signx == 1 ? -1 : 1);
@@ -197,18 +197,19 @@ export default function Game(props) {
 
     const resetGame = () =>{
 
+        setBallStepSize(7)
+        setSignY(1)
+        setSignX(1)
+
+        setStart(false)
         const timer = setTimeout(()=>{
+            setStart(true)
             //Restart game
             setBallPosition({
                 left: 200,
                 top: 200
             })
-
-            setBallStepSize(7)
-            setFinish(!finish)
-
-            setSignY(1)
-            setSignX(1)
+          
         }, 3000)
         
     }
