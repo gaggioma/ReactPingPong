@@ -7,4 +7,4 @@ My purpose was to try the power of React in animate web application, maintainig 
 Whole applicaton was developped using React Hooks, that i consider the cleanest and fastest way to write code in React.
 
 ## Result
-![](app/src/assets/img/ping-pong.gif)
+![result-ping-pong](https://github.com/gaggioma/ReactPingPong/blob/main/src/assets/img/ping-pong.gif)
