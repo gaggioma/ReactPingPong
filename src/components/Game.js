@@ -17,11 +17,16 @@ export default function Game(props) {
     //Game ref
     const gameRef = React.createRef();
 
+    //when ball is outside the arena, game finish
     const [finish, setFinish] = useState(false)
+
+    //Game start
     const [start, setStart] = useState(false)
 
-    //Ball
+    //Every ballSpeed ms ball increase of ballStepSize pixel
     const [ballStepSize, setBallStepSize] = useState(7);
+    
+    //time to refresh ball position in ms
     const [ballSpeed, setBallSpeed] = useState(10)
 
     //Ball dimensions
@@ -30,6 +35,8 @@ export default function Game(props) {
 
     //Window dimension
     //const { height, width } = useWindowDimensions();
+
+    //Game dimension
     const [gameDim, setGameDim] = useState()
     useEffect(() => {
         const width = gameRef.current.clientWidth;
@@ -41,17 +48,19 @@ export default function Game(props) {
         setStart(true)
     }, [])
 
-    //position first paddle
+    //position right paddle
     const [y1, setY1] = useState(150);
     const [r1, setR1] = useState(0);
     const [outside1Up, setOutside1Up] = useState(false);
     const [outside1Down, setOutside1Down] = useState(false);
+    const [leftPaddleAutoPilot, setLeftPaddleAutoPilot] = useState(false);
 
-    //Position second paddle
+    //Position left paddle
     const [y2, setY2] = useState(150);
     const [l2, setL2] = useState(0);
     const [outside2Up, setOutside2Up] = useState(false);
     const [outside2Down, setOutside2Down] = useState(false);
+    const [rightPaddleAutoPilot, setRightPaddleAutoPilot] = useState(true);
 
     //Ball position
     const [ballPosition, setBallPosition] = useState({
@@ -59,8 +68,10 @@ export default function Game(props) {
         top: 200
     });
     
-    //Ball sign x
+    //Ball sign x: 1->right, -1->left
     const [signx, setSignX] = useState(1)
+
+    //Ball y direction. 1->up, -1->down
     const [signy, setSignY] = useState(1)
 
     //Ball step size y
@@ -71,9 +82,14 @@ export default function Game(props) {
 
         if(start){
 
-        //Update right paddle with new position
-            setY1(ballPosition.top + ballStepY * signy + pHeight >= gameDim.height ? gameDim.height - pHeight : ballPosition.top + ballStepY * signy)
-       
+            //Auto pilot*_
+            if(rightPaddleAutoPilot){
+                setY1(ballPosition.top + ballStepY * signy + pHeight >= gameDim.height ? gameDim.height - pHeight : ballPosition.top + ballStepY * signy)
+            }
+
+            if(leftPaddleAutoPilot){
+                setY2(ballPosition.top + ballStepY * signy + pHeight >= gameDim.height ? gameDim.height - pHeight : ballPosition.top + ballStepY * signy)
+            }
 
             const timer = setTimeout(()=>{
 
@@ -86,37 +102,47 @@ export default function Game(props) {
                     setSignY(signy == 1 ? -1 : 1);
                 }
 
-                //Overflow left change sign of lef
+                //Overflow left change sign of left
                 else if(isOutsideLeft(ballPosition.left + ballStepSize * signx, ballW)){
 
-                    //Ball is in paddle
+                    //Ball is in paddle left
                     if(ballPosition.top >=  y2 && ballPosition.top <= y2 + pHeight){
 
                         //Increase speed
                         setBallStepSize(ballStepSize + 1); 
 
                         //Random angle
-                        setBallStepY(Math.floor(Math.random() * 6) + 3); 
+                        setBallStepY(Math.floor(Math.random() * 10) + 3); 
                         
                         //Invert direction
                         setSignX(signx == 1 ? -1 : 1);
+
+                        //disable auto pilot left and enable right
+                        setRightPaddleAutoPilot(true)
+                        setLeftPaddleAutoPilot(false);
+
                     }else{
                         setFinish(true)
                     }
                 }  
                 else if(isOutsideRight(ballPosition.left + ballStepSize * signx, ballW)){
 
-                    //Ball is in paddle
+                    //Ball is in paddle right
                     if(ballPosition.top >=  y1 && ballPosition.top <= y1 + pHeight){
 
                         //Increase speed
                         setBallStepSize(ballStepSize + 1);  
 
                         //Random angle
-                        setBallStepY(Math.floor(Math.random() * 6) + 3);
+                        setBallStepY(Math.floor(Math.random() * 10) + 3);
 
                         //Invert direction
                         setSignX(signx == 1 ? -1 : 1);
+
+                        //disable auto pilot right and enable left
+                        setRightPaddleAutoPilot(false)
+                        setLeftPaddleAutoPilot(true);
+
                     }else{
                         setFinish(true)
 
@@ -208,11 +234,10 @@ export default function Game(props) {
         onWheel = {onMouseWheel}
         tabIndex="0"
         >
-
+            {/*
             <div style={{color: "white"}} >
             width: {width} ~ height: {height}
             </div>
-
             {gameDim ?
             <div style={{color: "white"}} >
             width: {gameDim.width} ~ height: {gameDim.height}
@@ -220,6 +245,12 @@ export default function Game(props) {
             :
             null
             }
+            */
+
+            }
+            
+
+            
 
             {
                 outside2Down ? 
